@@ -35,10 +35,10 @@ function handleDrop(event, ui) {
 // TODO: when the page loads, render the task list, add event listeners, make lanes droppable, and make the due date field a date picker
 $(document).ready(function () {
 
+   $(".btn-success").on("click", handleAddTask) // add event listener to open modal
+
 });
 
 
 //TEST STATEMENTS
-console.log(generateTaskId());
-console.log(generateTaskId());
 console.log(generateTaskId());
