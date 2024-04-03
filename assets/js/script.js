@@ -1,10 +1,10 @@
 // Retrieve tasks and nextId from localStorage
 let taskList = JSON.parse(localStorage.getItem("tasks"));
-let nextId = JSON.parse(localStorage.getItem("nextId"));
+let nextId = localStorage.getItem("nextId");
 
 // ✅ create a function to generate a unique task id
 function generateTaskId() {
-    return Math.floor(Math.random()*Date.now()).toString(16);
+    return Math.floor(Math.random()*Date.now()).toString(16).trim();
 }
 
 // TODO: create a function to create a task card
@@ -17,7 +17,7 @@ function renderTaskList() {
 
 }
 
-// TODO: create a function to handle adding a new task
+// create a function to handle adding a new task
 function handleAddTask(event){
 
     event.preventDefault();
@@ -27,7 +27,8 @@ function handleAddTask(event){
     const dueDate = $("#due-date").val().trim(); 
     const description = $("#description").val().trim();
 
-    let taskList = [];
+    taskList = [];
+    nextId = [];
 
     // create task object
     const task = { 
@@ -36,6 +37,7 @@ function handleAddTask(event){
         description: description, 
         status: "todo",
     };
+    const id = generateTaskId();
 
     // checks that all inputs are valid
     if (!title || !dueDate|| !description) {
@@ -45,17 +47,22 @@ function handleAddTask(event){
 
     // gets tasks from local storage
     if (localStorage.length !== 0) {
-        const storage = localStorage.getItem("taskList");
-        taskList = JSON.parse(storage);
+
+        const currTasks = localStorage.getItem("tasks");
+        taskList = JSON.parse(currTasks);
+
+        const currIds = localStorage.getItem("nextId");
+        nextId.push(currIds);
     }
 
-    // add new task to task list
+    // add new task to task list array
     taskList.push(task);
-    console.log(taskList);
+    nextId.push(id); 
 
     // update task list in local storage
     const stringList = JSON.stringify(taskList);
-    localStorage.setItem("taskList", stringList);
+    localStorage.setItem("tasks", stringList);
+    localStorage.setItem("nextId", nextId);
 
     // empty form input fields
     $("#title").val("");
