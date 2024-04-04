@@ -8,61 +8,79 @@ function generateTaskId() {
 }
 
 // TODO: create a function to create a task card
-function createTaskCard(task) {
-    // TODO: add necessary classes to the elements including for styling
-    console.log(task);
-    const jsTask = JSON.parse(task);
-    console.log(jsTask);
+function createTaskCard(task, currDate) {
 
-    // create container elmt
+    // determine days from today until the due date
+    const remainingDays = currDate.diff(task.dueDate, 'day')*-1;
+    let daysLeft;
+
+    // sets text based on days until deadline
+    if (remainingDays > 0) {
+        daysLeft = `Due in ${remainingDays} days`;
+    } else if (remainingDays === 1) {
+        daysLeft = 'Due tomorrow';
+    } else if (remainingDays == 0) {
+        daysLeft = 'Due today';
+    } else {
+        daysLeft = `${Math.abs(remainingDays)} days overdue`;
+    }
+
+    // create all elements
     const containerEl = document.createElement("article");
-    // TODO: ADD CLASSES
-    // containerEl.addClass("task-card");
-
-    // create h3 elmt
     const h3El = document.createElement("h3");
-    // h3El.text(task.title);
-
-    // create urgency/prioritization elmt 
-    const pEl = document.createElement("p");
-
-    // pEl.text("calculate amount of time from current date until due date and return a string");
-
-    // create due date elmt
+    const descEl = document.createElement("p");
+    const daysTilDue = document.createElement("p");
     const timeEl = document.createElement("time");
+    const btnEl = document.createElement("button");
+
+    // add content to elmts
+    h3El.textContent = task.title;
+
+    //TODO: change remaining days content to explain how close it is to due
+    daysTilDue.textContent = daysLeft;
+    descEl.textContent = task.description;
+    timeEl.textContent = task.dueDate;
+    btnEl.textContent = "Delete";
+
+    // TODO: add necessary classes to the elements including for styling
+    // container classes
+    containerEl.classList.add("task-card");
     // timeEl.attr("datetime");
     // timeEl.text(task.dueDate);
 
-    // create delete btn elmt
-    const btnEl = document.createElement("button");
-
     // add elmts to container
     containerEl.appendChild(h3El);
-    containerEl.appendChild(pEl);
+    containerEl.appendChild(daysTilDue);
+    containerEl.appendChild(descEl);
     containerEl.appendChild(timeEl);
     containerEl.appendChild(btnEl);
 
     return containerEl;
-
 }
 
 // TODO: create a function to render the task list and make cards draggable
 function renderTaskList() {
 
-    // TEST STATEMENTS
-    console.log(localStorage.getItem("tasks"));
-    console.log(typeof localStorage.getItem("tasks"));
+    const todayObj = dayjs(); // today's date
+    const storedTasks = localStorage.getItem("tasks"); // retrieve tasks from storage
+    const allTasks = JSON.parse(storedTasks); // converts JSON tasks to js
 
-    // TEST ONLY REPLACE WITH LOOP
-    const nextCard = createTaskCard(localStorage.getItem("tasks"));
-    $("#todo-cards").append(nextCard);
+    // TEST
+    // console.log(allTasks);
+    // console.log(today);
+    // console.log(todayObj);
+    // const today = dayjs().format('MM-DD-YYYY');
 
-        // sort tasks into their respective columns
+    allTasks.forEach(task => {
+        const nextTask = createTaskCard(task, todayObj); // creates new task card
 
+        // TODO: modify to be based on the task status
+        $("#todo-cards").append(nextTask); // adds task card to it's container  
+    });
 }
 
 // create a function to handle adding a new task
-function handleAddTask(event){
+function handleAddTask(event) {
     event.preventDefault();
 
     // assign input content to variables
@@ -80,7 +98,8 @@ function handleAddTask(event){
         description: description, 
         status: "todo",
     };
-    const id = generateTaskId();
+
+    const id = generateTaskId(); // creates unique id
 
     // checks that all inputs are valid
     if (!title || !dueDate|| !description) {
@@ -88,7 +107,7 @@ function handleAddTask(event){
         return;
     }
 
-    // gets tasks from local storage
+    // gets tasks and IDs from local storage
     if (localStorage.length !== 0) {
 
         const currTasks = localStorage.getItem("tasks");
