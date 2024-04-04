@@ -1,6 +1,6 @@
 // Retrieve tasks and nextId from localStorage
 let taskList = JSON.parse(localStorage.getItem("tasks"));
-let nextId = localStorage.getItem("nextId");
+// let nextId = localStorage.getItem("nextId");
 
 // ✅ create a function to generate a unique task id
 function generateTaskId() {
@@ -36,7 +36,7 @@ function createTaskCard(task, currDate) {
     // add content to elmts
     h3El.textContent = task.title;
 
-    //TODO: change remaining days content to explain how close it is to due
+    // sets content of each html element in the task card
     daysTilDue.textContent = daysLeft;
     descEl.textContent = task.description;
     timeEl.textContent = task.dueDate;
@@ -74,8 +74,14 @@ function renderTaskList() {
     allTasks.forEach(task => {
         const nextTask = createTaskCard(task, todayObj); // creates new task card
 
-        // TODO: modify to be based on the task status
-        $("#todo-cards").append(nextTask); // adds task card to it's container  
+        // add task cards to appropriate container based on status
+        if (task.status === 'to-do') {
+            $("#todo-cards").append(nextTask); // adds task card to todo container
+        } else if (task.status === 'in-progress') {
+            $("#in-progress-cards").append(nextTask); // adds task card to in progress container 
+        } else {
+            $("#done-cards").append(nextTask); // adds task card to done container 
+        }      
     });
 }
 
@@ -89,17 +95,19 @@ function handleAddTask(event) {
     const description = $("#description").val().trim();
 
     taskList = [];
-    nextId = [];
+    // nextId = [];
+    const id = generateTaskId(); // creates unique id
 
     // create task object
     const task = { 
+        id: id,
         title: title,
         dueDate: dueDate, 
         description: description, 
-        status: "todo",
+        status: "to-do",
     };
 
-    const id = generateTaskId(); // creates unique id
+    
 
     // checks that all inputs are valid
     if (!title || !dueDate|| !description) {
@@ -113,18 +121,18 @@ function handleAddTask(event) {
         const currTasks = localStorage.getItem("tasks");
         taskList = JSON.parse(currTasks);
 
-        const currIds = localStorage.getItem("nextId");
-        nextId.push(currIds);
+        // const currIds = localStorage.getItem("nextId");
+        // nextId.push(currIds);
     }
 
     // add new task to task list array
     taskList.push(task);
-    nextId.push(id); 
+    // nextId.push(id); 
 
     // update task list in local storage
     const stringList = JSON.stringify(taskList);
     localStorage.setItem("tasks", stringList);
-    localStorage.setItem("nextId", nextId);
+    // localStorage.setItem("nextId", nextId);
 
     // empty form input fields
     $("#title").val("");
@@ -146,7 +154,9 @@ function handleDrop(event, ui) {
 // TODO: when the page loads, render the task list, add event listeners, make lanes droppable, and make the due date field a date picker
 $(document).ready(function () {
 
-    renderTaskList();
+    if (localStorage.length !== 0) {
+        renderTaskList();
+    }
 
     $("[type='submit']").on("click", handleAddTask) // add event listener to open modal
 
