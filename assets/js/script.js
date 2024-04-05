@@ -1,6 +1,5 @@
-// Retrieve tasks and nextId from localStorage
+// Retrieve tasks from localStorage
 let taskList = JSON.parse(localStorage.getItem("tasks"));
-let nextId = localStorage.getItem("nextId");
 
 // ✅ create a function to generate a unique task id
 function generateTaskId() {
@@ -14,17 +13,6 @@ function createTaskCard(task, currDate) {
     const remainingDays = currDate.diff(task.dueDate, 'day')*-1;
     let daysLeft;
 
-    // sets text based on days until deadline
-    if (remainingDays > 0) {
-        daysLeft = `Due in ${remainingDays} days`;
-    } else if (remainingDays === 1) {
-        daysLeft = 'Due tomorrow';
-    } else if (remainingDays == 0) {
-        daysLeft = 'Due today';
-    } else {
-        daysLeft = `${Math.abs(remainingDays)} days overdue`;
-    }
-
     // create all elements
     const containerEl = document.createElement("article");
     const h3El = document.createElement("h3");
@@ -33,10 +21,23 @@ function createTaskCard(task, currDate) {
     const timeEl = document.createElement("time");
     const btnEl = document.createElement("button");
 
-    // add content to elmts
-    h3El.textContent = task.title;
+    // sets text based on days until deadline
+    if (remainingDays > 0) {
+        daysLeft = `Due in ${remainingDays} days`;
+        containerEl.classList.add('not-due');
+    } else if (remainingDays === 1) {
+        daysLeft = 'Due tomorrow';
+        containerEl.classList.add('due-soon');
+    } else if (remainingDays == 0) {
+        daysLeft = 'Due today';
+        containerEl.classList.add('due-soon');
+    } else {
+        daysLeft = `${Math.abs(remainingDays)} days overdue`;
+        containerEl.classList.add('past-due');
+    }
 
     // sets content of each html element in the task card
+    h3El.textContent = task.title;
     daysTilDue.textContent = daysLeft;
     descEl.textContent = task.description;
     timeEl.textContent = task.dueDate;
@@ -98,11 +99,10 @@ function handleAddTask(event) {
     const description = $("#description").val().trim();
 
     taskList = [];
-    nextId = [];
     const id = generateTaskId(); // creates unique id
 
     // create task object
-    const task = { 
+    const task = {
         id: id,
         title: title,
         dueDate: dueDate, 
@@ -111,7 +111,7 @@ function handleAddTask(event) {
     };
 
     // checks that all inputs are valid
-    if (!title || !dueDate|| !description) {
+    if (!title || !dueDate || !description) {
         alert("All inputs are required to add a task.");
         return;
     }
@@ -121,19 +121,14 @@ function handleAddTask(event) {
 
         const currTasks = localStorage.getItem("tasks");
         taskList = JSON.parse(currTasks);
-
-        const currIds = localStorage.getItem("nextId");
-        nextId.push(currIds);
     }
 
     // add new task to task list array
     taskList.push(task);
-    nextId.push(id); 
 
     // update task list in local storage
     const stringList = JSON.stringify(taskList);
     localStorage.setItem("tasks", stringList);
-    localStorage.setItem("nextId", nextId);
 
     // empty form input fields
     $("#title").val("");
