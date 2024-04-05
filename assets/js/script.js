@@ -47,6 +47,7 @@ function createTaskCard(task, currDate) {
     // container classes
     containerEl.classList.add("task-card");
     containerEl.setAttribute('id', task.id);
+    btnEl.classList.add('delete-btn');
 
     // add elmts to container
     containerEl.appendChild(h3El);
@@ -61,15 +62,17 @@ function createTaskCard(task, currDate) {
 // TODO: create a function to render the task list and make cards draggable
 function renderTaskList() {
     // clear current task cards
-    $('#to-do-cards').empty();
+    $('#todo-cards').empty();
     $('#in-progress-cards').empty();
     $('#done-cards').empty();
 
     const todayObj = dayjs(); // today's date
     const storedTasks = localStorage.getItem("tasks"); // retrieve tasks from storage
-    const allTasks = JSON.parse(storedTasks); // converts JSON tasks to js
+    
+    // converts JSON tasks to js
+    taskList = JSON.parse(storedTasks); 
 
-    allTasks.forEach(task => {
+        taskList.forEach(task => {
         const nextTask = createTaskCard(task, todayObj); // creates new task card
 
         // add task cards to appropriate container based on status
@@ -139,8 +142,16 @@ function handleAddTask(event) {
 }
 
 // TODO: create a function to handle deleting a task
-function handleDeleteTask(event){
+function handleDeleteTask(event) {
+    const task = event.target.closest('.task-card');
+    const id =task.getAttribute('id');
+    $(`#${id}`).remove();
 
+    const indexToRemove = taskList.findIndex((task) => task.id === id);
+    taskList.splice(indexToRemove, 1);
+    localStorage.setItem("tasks", JSON.stringify(taskList));
+
+    renderTaskList();
 }
 
 // TODO: create a function to handle dropping a task into a new status lane
@@ -164,7 +175,7 @@ function handleDrop(event, ui) {
     renderTaskList();
 }
 
-// TODO: when the page loads, render the task list, add event listeners, make lanes droppable, and make the due date field a date picker
+// when the page loads, render the task list, add event listeners, make lanes droppable, and make the due date field a date picker
 $(document).ready(function () {
 
     // render all task cards
@@ -173,7 +184,10 @@ $(document).ready(function () {
     }
 
     // add event listener to open modal
-    $("[type='submit']").on("click", handleAddTask) ;
+    $("[type='submit']").on("click", handleAddTask);
+
+    //add event listener to delete button
+    $(".task-card").on("click", ".delete-btn", handleDeleteTask);
 
     // add droppable to columns
     $(function () {
