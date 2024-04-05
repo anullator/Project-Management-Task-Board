@@ -1,3 +1,9 @@
+:root {
+  --color-past-due: red;
+  --color-due-soon: orange;
+  --color-not-due: green;
+}
+
 body {
   font-family: 'Open Sans', sans-serif;
   font-size: 16px;
@@ -14,4 +20,16 @@ body {
 
 .task-card:hover {
   cursor: grab;
+}
+
+.not-due {
+  background-color: var(--color-not-due);
+}
+
+.due-soon {
+  background-color: var(--color-due-soon);;
+}
+
+.past-due {
+  background-color: var(--color-past-due);
 }
